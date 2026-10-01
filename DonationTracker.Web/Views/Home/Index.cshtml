@@ -2,36 +2,51 @@
     ViewData["Title"] = "Home";
 }
 
-<h1>DonationTracker</h1>
+<section class="hero">
+    <h1>DonationTracker</h1>
+    <p class="lead">
+        A small ASP.NET Core MVC app that records supporters and the donations
+        they make, and keeps a running campaign total.
+    </p>
+    <a asp-controller="Donations" asp-action="Index" class="btn btn-light">View donations</a>
+    <a asp-controller="Supporters" asp-action="Index" class="btn btn-outline-light">View supporters</a>
+</section>
 
-<p class="lead">
-    A small ASP.NET Core MVC app that records supporters and the donations they
-    make, and keeps a running campaign total.
-</p>
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="card card-body h-100">
+            <h2>What it does</h2>
+            <ul class="mb-3">
+                <li><a asp-controller="Supporters" asp-action="Index">Supporters</a>: list, add and edit the people who donate.</li>
+                <li><a asp-controller="Donations" asp-action="Index">Donations</a>: a paged list with the campaign total, plus add and edit.</li>
+                <li><a href="/api/donations">GET /api/donations</a>: the same donations as paged JSON.</li>
+                <li><a asp-controller="Account" asp-action="Login">Staff sign in</a>: anyone can view, only signed-in staff can add or edit.</li>
+            </ul>
+            <p class="mb-0">
+                Every form is validated in the browser and again on the server.
+                A donation cannot be dated in the future and must belong to an
+                existing supporter.
+            </p>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="card card-body h-100">
+            <h2>How it was built</h2>
+            <ul class="mb-0">
+                <li><strong>ASP.NET Core MVC on .NET 10</strong>, with Razor views, tag helpers and Bootstrap.</li>
+                <li><strong>Entity Framework Core and SQL Server LocalDB</strong>, with the schema managed by migrations.</li>
+                <li><strong>Three layers</strong>: controllers call a service, the service calls a repository, and only the repository uses the database context.</li>
+                <li><strong>Business rules in the service</strong>, so they can be unit tested without a database.</li>
+                <li><strong>NUnit and Moq</strong> unit tests for the service, and integration tests that run the repository against a real database.</li>
+                <li><strong>Hand-written SQL</strong>: a stored procedure and a covering index, measured before and after with execution plans (402 logical reads down to 4).</li>
+                <li><strong>A paged JSON API</strong> that returns DTOs, never the database entities.</li>
+                <li><strong>ASP.NET Core Identity</strong> for staff sign-in, with hashed passwords.</li>
+            </ul>
+        </div>
+    </div>
+</div>
 
-<h2 class="h4">What it does</h2>
-<ul>
-    <li><a asp-controller="Supporters" asp-action="Index">Supporters</a>: list, add and edit the people who donate.</li>
-    <li><a asp-controller="Donations" asp-action="Index">Donations</a>: list, add and edit donations, each linked to a supporter, with the campaign total at the top.</li>
-    <li><a href="/api/donations">GET /api/donations</a>: the most recent donations as JSON.</li>
-</ul>
-<p>
-    Every form is validated in the browser and again on the server. A donation
-    cannot be dated in the future and must belong to an existing supporter.
-</p>
-
-<h2 class="h4">How it was built</h2>
-<ul>
-    <li><strong>ASP.NET Core MVC on .NET 10</strong>, with Razor views, tag helpers and the template's Bootstrap.</li>
-    <li><strong>Entity Framework Core and SQL Server LocalDB</strong>, with the schema created by a single migration.</li>
-    <li><strong>Three layers</strong>: controllers call a service, the service calls a repository, and only the repository uses the database context.</li>
-    <li><strong>Business rules in the service</strong>, so they can be unit tested without a database.</li>
-    <li><strong>NUnit and Moq tests</strong> for the service, using a mocked repository.</li>
-    <li><strong>Hand-written SQL</strong>: a stored procedure and a covering index, measured before and after with execution plans (402 logical reads down to 4).</li>
-    <li><strong>A JSON API</strong> that returns a DTO, never the database entity.</li>
-</ul>
-
-<p>
+<p class="mt-4 mb-0">
     The full write-up is in the
     <a href="https://github.com/AJWCTech/donation-tracker-aspnet-mvc/blob/master/docs/DEVELOPMENT.md">development notes</a>,
     and the source is on

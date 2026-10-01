@@ -1,31 +1,150 @@
-html {
-  font-size: 14px;
+/* Site-wide styles. Bootstrap does the heavy lifting; this file sets the
+   colours, spacing and a few small components on top of it. */
+
+:root {
+  --dt-navy: #14213d;
+  --dt-accent: #0f766e;
+  --dt-accent-dark: #0b5c56;
+  --dt-background: #f5f7fa;
+  --dt-border: #e3e8ef;
+  --dt-text: #1f2937;
+  --dt-muted: #64748b;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
+/* Page */
 
 body {
-  margin-bottom: 60px;
+  background-color: var(--dt-background);
+  color: var(--dt-text);
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--dt-navy);
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--dt-navy);
+}
+
+a {
+  color: var(--dt-accent);
+}
+
+a:hover {
+  color: var(--dt-accent-dark);
+}
+
+/* Long text pages, such as the privacy policy, read better in a narrow column. */
+.prose {
+  max-width: 44rem;
+}
+
+/* Heading on the left, main action on the right. */
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.page-header h1 {
+  margin: 0;
+}
+
+/* Buttons, form fields and paging links in the accent colour */
+
+.btn-primary {
+  --bs-btn-bg: var(--dt-accent);
+  --bs-btn-border-color: var(--dt-accent);
+  --bs-btn-hover-bg: var(--dt-accent-dark);
+  --bs-btn-hover-border-color: var(--dt-accent-dark);
+  --bs-btn-active-bg: var(--dt-accent-dark);
+  --bs-btn-active-border-color: var(--dt-accent-dark);
+  --bs-btn-disabled-bg: var(--dt-accent);
+  --bs-btn-disabled-border-color: var(--dt-accent);
+}
+
+.btn:focus-visible,
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--dt-accent);
+  box-shadow: 0 0 0 0.2rem rgba(15, 118, 110, 0.25);
+}
+
+.pagination {
+  --bs-pagination-color: var(--dt-accent);
+  --bs-pagination-hover-color: var(--dt-accent-dark);
+  --bs-pagination-active-bg: var(--dt-accent);
+  --bs-pagination-active-border-color: var(--dt-accent);
+}
+
+/* Cards and tables */
+
+.card {
+  border-color: var(--dt-border);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px rgba(20, 33, 61, 0.05);
+}
+
+.table > :not(caption) > * > * {
+  padding: 0.75rem 1rem;
+}
+
+.table > thead th {
+  background-color: #f9fafb;
+  color: var(--dt-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Money lines up in a column when the digits are all the same width. */
+.amount {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The campaign total on the donations page */
+
+.stat-label {
+  color: var(--dt-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  color: var(--dt-navy);
+  font-size: 2rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+/* The introduction on the home page */
+
+.hero {
+  background-color: var(--dt-navy);
+  border-radius: 0.75rem;
+  color: #fff;
+  margin-bottom: 1.5rem;
+  padding: 2.5rem 2rem;
+}
+
+.hero h1 {
+  color: #fff;
+  font-size: 2.25rem;
+}
+
+.hero .lead {
+  color: #cbd5e1;
+  max-width: 40rem;
 }

@@ -9,8 +9,8 @@
 <p>Sign in to add or edit supporters and donations.</p>
 
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Login">
+    <div class="col-md-7 col-lg-5">
+        <form asp-action="Login" class="card card-body">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="ReturnUrl" />
             <div class="mb-3">
@@ -23,7 +23,9 @@
                 <input asp-for="Password" class="form-control" autocomplete="current-password" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
-            <button type="submit" class="btn btn-primary">Sign in</button>
+            <div>
+                <button type="submit" class="btn btn-primary">Sign in</button>
+            </div>
         </form>
     </div>
 </div>

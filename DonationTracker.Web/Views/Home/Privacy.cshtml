@@ -1,6 +1,7 @@
 @{
     ViewData["Title"] = "Privacy Policy";
 }
+<div class="prose">
 <h1>@ViewData["Title"]</h1>
 
 <p class="text-muted">Last updated: 2 October 2026</p>
@@ -10,43 +11,46 @@
     computer of whoever starts it. Please do not enter real personal data.
 </p>
 
-<h2 class="h4">What the app stores</h2>
+<h2 class="mt-4">What the app stores</h2>
 <ul>
     <li>Supporters: full name, email address and the date the record was created.</li>
     <li>Donations: the supporter, the amount and the date of the donation.</li>
+    <li>Staff accounts: the email address used to sign in and a hashed password. The password itself is never stored.</li>
 </ul>
 <p>
     The sample records added by the seed script are made up and do not describe
     real people.
 </p>
 
-<h2 class="h4">Where it is stored</h2>
+<h2 class="mt-4">Where it is stored</h2>
 <p>
     Everything is saved in a SQL Server LocalDB database on the machine running
     the app. Nothing is sent to any other server, service or third party.
 </p>
 
-<h2 class="h4">Cookies</h2>
+<h2 class="mt-4">Cookies</h2>
 <p>
-    The app sets one cookie: an anti-forgery cookie that protects the forms from
-    cross-site request forgery. There are no analytics, advertising or tracking
-    cookies, and no sign-in.
+    The app sets two cookies, both needed for it to work: an anti-forgery cookie
+    that protects the forms from cross-site request forgery, and a sign-in
+    cookie that keeps a member of staff signed in until they sign out or close
+    the browser. There are no analytics, advertising or tracking cookies.
 </p>
 
-<h2 class="h4">Third parties</h2>
+<h2 class="mt-4">Third parties</h2>
 <p>
     None. Bootstrap and jQuery are served from the app itself, so viewing a page
     makes no requests to outside sites.
 </p>
 
-<h2 class="h4">Keeping and removing data</h2>
+<h2 class="mt-4">Keeping and removing data</h2>
 <p>
     Records stay in the local database until that database is deleted. The app
     has no delete pages; a record can be changed on its edit page.
 </p>
 
-<h2 class="h4">Questions</h2>
+<h2 class="mt-4">Questions</h2>
 <p>
     Please raise an issue on the
     <a href="https://github.com/AJWCTech/donation-tracker-aspnet-mvc">project's GitHub repository</a>.
 </p>
+</div>

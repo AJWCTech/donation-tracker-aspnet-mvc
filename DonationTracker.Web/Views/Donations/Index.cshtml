@@ -4,64 +4,73 @@
     ViewData["Title"] = "Donations";
 }
 
-<h1>Donations</h1>
-
-<p class="lead">Campaign total: <strong>@Model.CampaignTotal.ToString("N2")</strong></p>
-
-<p>
+<div class="page-header">
+    <h1>Donations</h1>
     <a asp-action="Create" class="btn btn-primary">Add donation</a>
-</p>
+</div>
 
-<p class="text-muted">@Model.Page.TotalCount.ToString("N0") donations, newest first. Page @Model.Page.PageNumber.ToString("N0") of @Model.Page.TotalPages.ToString("N0").</p>
+<div class="card card-body mb-4">
+    <div class="stat-label">Campaign total</div>
+    <div class="stat-value">&pound;@Model.CampaignTotal.ToString("N2")</div>
+    <div class="text-muted small">From @Model.Page.TotalCount.ToString("N0") donations</div>
+</div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Supporter</th>
-            <th>Amount</th>
-            <th>Donated on</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (Donation donation in Model.Page.Donations)
-        {
-            <tr>
-                <td>@donation.Supporter?.FullName</td>
-                <td>@donation.Amount.ToString("N2")</td>
-                <td>@donation.DonatedOn.ToString("d MMM yyyy")</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@donation.Id">Edit</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div class="card mb-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Supporter</th>
+                    <th class="amount">Amount</th>
+                    <th>Donated on</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Donation donation in Model.Page.Donations)
+                {
+                    <tr>
+                        <td>@donation.Supporter?.FullName</td>
+                        <td class="amount">&pound;@donation.Amount.ToString("N2")</td>
+                        <td>@donation.DonatedOn.ToString("d MMM yyyy")</td>
+                        <td class="text-end">
+                            <a asp-action="Edit" asp-route-id="@donation.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
 
-<nav aria-label="Donation pages">
-    <ul class="pagination">
-        @if (Model.Page.PageNumber > 1)
-        {
-            <li class="page-item">
-                <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page.PageNumber - 1)">Previous</a>
-            </li>
-        }
-        else
-        {
-            <li class="page-item disabled"><span class="page-link">Previous</span></li>
-        }
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+    <span class="text-muted small">Page @Model.Page.PageNumber.ToString("N0") of @Model.Page.TotalPages.ToString("N0"), newest first</span>
 
-        <li class="page-item active"><span class="page-link">@Model.Page.PageNumber</span></li>
+    <nav aria-label="Donation pages">
+        <ul class="pagination mb-0">
+            @if (Model.Page.PageNumber > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page.PageNumber - 1)">Previous</a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item disabled"><span class="page-link">Previous</span></li>
+            }
 
-        @if (Model.Page.PageNumber < Model.Page.TotalPages)
-        {
-            <li class="page-item">
-                <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page.PageNumber + 1)">Next</a>
-            </li>
-        }
-        else
-        {
-            <li class="page-item disabled"><span class="page-link">Next</span></li>
-        }
-    </ul>
-</nav>
+            <li class="page-item active"><span class="page-link">@Model.Page.PageNumber</span></li>
+
+            @if (Model.Page.PageNumber < Model.Page.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page.PageNumber + 1)">Next</a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item disabled"><span class="page-link">Next</span></li>
+            }
+        </ul>
+    </nav>
+</div>

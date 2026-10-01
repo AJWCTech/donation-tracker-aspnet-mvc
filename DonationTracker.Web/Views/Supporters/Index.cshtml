@@ -4,32 +4,35 @@
     ViewData["Title"] = "Supporters";
 }
 
-<h1>Supporters</h1>
-
-<p>
+<div class="page-header">
+    <h1>Supporters</h1>
     <a asp-action="Create" class="btn btn-primary">Add supporter</a>
-</p>
+</div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Full name</th>
-            <th>Email</th>
-            <th>Created on</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (Supporter supporter in Model)
-        {
-            <tr>
-                <td>@supporter.FullName</td>
-                <td>@supporter.Email</td>
-                <td>@supporter.CreatedOn.ToString("d MMM yyyy")</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@supporter.Id">Edit</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Full name</th>
+                    <th>Email</th>
+                    <th>Created on</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Supporter supporter in Model)
+                {
+                    <tr>
+                        <td>@supporter.FullName</td>
+                        <td>@supporter.Email</td>
+                        <td>@supporter.CreatedOn.ToString("d MMM yyyy")</td>
+                        <td class="text-end">
+                            <a asp-action="Edit" asp-route-id="@supporter.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
