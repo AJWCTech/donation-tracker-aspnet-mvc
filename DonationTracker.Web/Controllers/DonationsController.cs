@@ -38,7 +38,23 @@ public class DonationsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(Donation donation)
     {
-        await _service.CreateDonationAsync(donation);
+        if (!ModelState.IsValid)
+        {
+            await PopulateSupportersAsync();
+            return View(donation);
+        }
+
+        try
+        {
+            await _service.CreateDonationAsync(donation);
+        }
+        catch (BusinessRuleException ex)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
+            await PopulateSupportersAsync();
+            return View(donation);
+        }
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -65,10 +81,25 @@ public class DonationsController : Controller
             return NotFound();
         }
 
-        bool updated = await _service.UpdateDonationAsync(donation);
-        if (!updated)
+        if (!ModelState.IsValid)
         {
-            return NotFound();
+            await PopulateSupportersAsync();
+            return View(donation);
+        }
+
+        try
+        {
+            bool updated = await _service.UpdateDonationAsync(donation);
+            if (!updated)
+            {
+                return NotFound();
+            }
+        }
+        catch (BusinessRuleException ex)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
+            await PopulateSupportersAsync();
+            return View(donation);
         }
 
         return RedirectToAction(nameof(Index));

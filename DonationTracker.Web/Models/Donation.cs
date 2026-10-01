@@ -10,6 +10,7 @@ public class Donation
     [Display(Name = "Supporter")]
     public int SupporterId { get; set; }
 
+    [Range(0.01, 1000000)]
     [Precision(10, 2)]
     public decimal Amount { get; set; }
 

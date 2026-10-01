@@ -31,6 +31,11 @@ public class SupportersController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(Supporter supporter)
     {
+        if (!ModelState.IsValid)
+        {
+            return View(supporter);
+        }
+
         await _service.CreateSupporterAsync(supporter);
         return RedirectToAction(nameof(Index));
     }
@@ -55,6 +60,11 @@ public class SupportersController : Controller
         if (id != supporter.Id)
         {
             return NotFound();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return View(supporter);
         }
 
         bool updated = await _service.UpdateSupporterAsync(supporter);

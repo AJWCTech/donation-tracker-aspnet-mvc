@@ -61,6 +61,7 @@ public class DonationService : IDonationService
 
     public async Task CreateDonationAsync(Donation donation)
     {
+        await CheckDonationRulesAsync(donation);
         await _repository.AddDonationAsync(donation);
     }
 
@@ -72,10 +73,26 @@ public class DonationService : IDonationService
             return false;
         }
 
+        await CheckDonationRulesAsync(donation);
+
         existing.SupporterId = donation.SupporterId;
         existing.Amount = donation.Amount;
         existing.DonatedOn = donation.DonatedOn;
         await _repository.UpdateDonationAsync(existing);
         return true;
+    }
+
+    private async Task CheckDonationRulesAsync(Donation donation)
+    {
+        if (donation.DonatedOn.Date > DateTime.Today)
+        {
+            throw new BusinessRuleException("The donation date cannot be in the future.");
+        }
+
+        Supporter? supporter = await _repository.GetSupporterByIdAsync(donation.SupporterId);
+        if (supporter == null)
+        {
+            throw new BusinessRuleException("The selected supporter does not exist.");
+        }
     }
 }
