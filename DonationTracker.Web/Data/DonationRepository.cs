@@ -42,12 +42,21 @@ public class DonationRepository : IDonationRepository
         return await _context.Donations.SumAsync(d => d.Amount);
     }
 
-    public async Task<List<Donation>> GetRecentDonationsAsync(int count)
+    public async Task<int> CountDonationsAsync()
     {
+        return await _context.Donations.CountAsync();
+    }
+
+    public async Task<List<Donation>> GetDonationsPageAsync(int pageNumber, int pageSize)
+    {
+        // Ordering by Id as well keeps rows with the same date in a fixed
+        // order, so a row cannot appear on two pages.
         return await _context.Donations
             .Include(d => d.Supporter)
             .OrderByDescending(d => d.DonatedOn)
-            .Take(count)
+            .ThenByDescending(d => d.Id)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
     }
 

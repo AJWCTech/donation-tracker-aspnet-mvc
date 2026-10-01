@@ -7,6 +7,8 @@ namespace DonationTracker.Web.Controllers;
 
 public class DonationsController : Controller
 {
+    private const int PageSize = 25;
+
     private readonly IDonationService _service;
 
     public DonationsController(IDonationService service)
@@ -14,12 +16,12 @@ public class DonationsController : Controller
         _service = service;
     }
 
-    // GET: /Donations
-    public async Task<IActionResult> Index()
+    // GET: /Donations?page=2
+    public async Task<IActionResult> Index(int page = 1)
     {
         DonationListViewModel model = new DonationListViewModel
         {
-            Donations = await _service.GetRecentDonationsAsync(),
+            Page = await _service.GetDonationPageAsync(page, PageSize),
             CampaignTotal = await _service.GetCampaignTotalAsync()
         };
 

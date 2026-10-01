@@ -12,7 +12,7 @@
     <a asp-action="Create" class="btn btn-primary">Add donation</a>
 </p>
 
-<p class="text-muted">Showing the @Model.Donations.Count most recent donations.</p>
+<p class="text-muted">@Model.Page.TotalCount.ToString("N0") donations, newest first. Page @Model.Page.PageNumber.ToString("N0") of @Model.Page.TotalPages.ToString("N0").</p>
 
 <table class="table">
     <thead>
@@ -24,7 +24,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (Donation donation in Model.Donations)
+        @foreach (Donation donation in Model.Page.Donations)
         {
             <tr>
                 <td>@donation.Supporter?.FullName</td>
@@ -37,3 +37,31 @@
         }
     </tbody>
 </table>
+
+<nav aria-label="Donation pages">
+    <ul class="pagination">
+        @if (Model.Page.PageNumber > 1)
+        {
+            <li class="page-item">
+                <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page.PageNumber - 1)">Previous</a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item disabled"><span class="page-link">Previous</span></li>
+        }
+
+        <li class="page-item active"><span class="page-link">@Model.Page.PageNumber</span></li>
+
+        @if (Model.Page.PageNumber < Model.Page.TotalPages)
+        {
+            <li class="page-item">
+                <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page.PageNumber + 1)">Next</a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item disabled"><span class="page-link">Next</span></li>
+        }
+    </ul>
+</nav>

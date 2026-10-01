@@ -13,11 +13,11 @@ public interface IDonationService
     // Returns false when no supporter with that Id exists.
     Task<bool> UpdateSupporterAsync(Supporter supporter);
 
-    // Returns the most recent donations only, newest first.
-    Task<List<Donation>> GetRecentDonationsAsync();
+    // Returns one page of donations, newest first. Page numbers start at 1.
+    Task<DonationPage> GetDonationPageAsync(int pageNumber, int pageSize);
 
-    // The same donations, mapped to the shape the API returns.
-    Task<List<DonationDto>> GetRecentDonationDtosAsync();
+    // The same page, mapped to the shape the API returns.
+    Task<DonationPageDto> GetDonationPageDtoAsync(int pageNumber, int pageSize);
 
     Task<Donation?> GetDonationAsync(int id);
 

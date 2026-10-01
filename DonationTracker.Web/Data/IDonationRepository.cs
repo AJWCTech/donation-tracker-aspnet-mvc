@@ -14,7 +14,10 @@ public interface IDonationRepository
 
     Task<decimal> GetDonationTotalAsync();
 
-    Task<List<Donation>> GetRecentDonationsAsync(int count);
+    Task<int> CountDonationsAsync();
+
+    // pageNumber starts at 1. Newest donations come first.
+    Task<List<Donation>> GetDonationsPageAsync(int pageNumber, int pageSize);
 
     Task<Donation?> GetDonationByIdAsync(int id);
 

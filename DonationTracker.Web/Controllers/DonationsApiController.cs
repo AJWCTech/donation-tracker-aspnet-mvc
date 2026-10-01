@@ -15,11 +15,11 @@ public class DonationsApiController : ControllerBase
         _service = service;
     }
 
-    // GET: /api/donations
+    // GET: /api/donations?page=1&pageSize=25
     [HttpGet]
-    public async Task<ActionResult<List<DonationDto>>> GetDonations()
+    public async Task<ActionResult<DonationPageDto>> GetDonations(int page = 1, int pageSize = 25)
     {
-        List<DonationDto> donations = await _service.GetRecentDonationDtosAsync();
+        DonationPageDto donations = await _service.GetDonationPageDtoAsync(page, pageSize);
         return Ok(donations);
     }
 }

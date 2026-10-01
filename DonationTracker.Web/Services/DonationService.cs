@@ -5,7 +5,7 @@ namespace DonationTracker.Web.Services;
 
 public class DonationService : IDonationService
 {
-    private const int RecentDonationCount = 100;
+    private const int MaxPageSize = 100;
 
     private readonly IDonationRepository _repository;
 
@@ -45,17 +45,57 @@ public class DonationService : IDonationService
         return true;
     }
 
-    public async Task<List<Donation>> GetRecentDonationsAsync()
+    public async Task<DonationPage> GetDonationPageAsync(int pageNumber, int pageSize)
     {
-        return await _repository.GetRecentDonationsAsync(RecentDonationCount);
+        // Keep the page size within sensible limits.
+        if (pageSize < 1)
+        {
+            pageSize = 1;
+        }
+
+        if (pageSize > MaxPageSize)
+        {
+            pageSize = MaxPageSize;
+        }
+
+        int totalCount = await _repository.CountDonationsAsync();
+
+        // Round up, so 51 rows at 25 per page is 3 pages. Always at least 1.
+        int totalPages = (totalCount + pageSize - 1) / pageSize;
+        if (totalPages < 1)
+        {
+            totalPages = 1;
+        }
+
+        // A page number outside the range is moved to the nearest valid page.
+        if (pageNumber < 1)
+        {
+            pageNumber = 1;
+        }
+
+        if (pageNumber > totalPages)
+        {
+            pageNumber = totalPages;
+        }
+
+        List<Donation> donations = await _repository.GetDonationsPageAsync(pageNumber, pageSize);
+
+        return new DonationPage
+        {
+            Donations = donations,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalCount = totalCount,
+            TotalPages = totalPages
+        };
     }
 
-    public async Task<List<DonationDto>> GetRecentDonationDtosAsync()
+    public async Task<DonationPageDto> GetDonationPageDtoAsync(int pageNumber, int pageSize)
     {
-        List<Donation> donations = await _repository.GetRecentDonationsAsync(RecentDonationCount);
+        DonationPage page = await GetDonationPageAsync(pageNumber, pageSize);
 
-        List<DonationDto> dtos = new List<DonationDto>();
-        foreach (Donation donation in donations)
+        List<DonationDto> items = new List<DonationDto>();
+        foreach (Donation donation in page.Donations)
         {
             DonationDto dto = new DonationDto
             {
@@ -64,10 +104,17 @@ public class DonationService : IDonationService
                 Amount = donation.Amount,
                 DonatedOn = donation.DonatedOn
             };
-            dtos.Add(dto);
+            items.Add(dto);
         }
 
-        return dtos;
+        return new DonationPageDto
+        {
+            Items = items,
+            PageNumber = page.PageNumber,
+            PageSize = page.PageSize,
+            TotalCount = page.TotalCount,
+            TotalPages = page.TotalPages
+        };
     }
 
     public async Task<Donation?> GetDonationAsync(int id)
