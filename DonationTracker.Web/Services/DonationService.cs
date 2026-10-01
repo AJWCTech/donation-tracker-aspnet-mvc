@@ -5,6 +5,8 @@ namespace DonationTracker.Web.Services;
 
 public class DonationService : IDonationService
 {
+    private const int RecentDonationCount = 100;
+
     private readonly IDonationRepository _repository;
 
     public DonationService(IDonationRepository repository)
@@ -43,9 +45,9 @@ public class DonationService : IDonationService
         return true;
     }
 
-    public async Task<List<Donation>> GetDonationsAsync()
+    public async Task<List<Donation>> GetRecentDonationsAsync()
     {
-        return await _repository.GetDonationsAsync();
+        return await _repository.GetRecentDonationsAsync(RecentDonationCount);
     }
 
     public async Task<Donation?> GetDonationAsync(int id)

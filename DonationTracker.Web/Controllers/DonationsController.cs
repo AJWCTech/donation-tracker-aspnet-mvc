@@ -19,7 +19,7 @@ public class DonationsController : Controller
     {
         DonationListViewModel model = new DonationListViewModel
         {
-            Donations = await _service.GetDonationsAsync(),
+            Donations = await _service.GetRecentDonationsAsync(),
             CampaignTotal = await _service.GetCampaignTotalAsync()
         };
 

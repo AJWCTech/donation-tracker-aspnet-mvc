@@ -44,6 +44,15 @@ public class DonationRepository : IDonationRepository
             .ToListAsync();
     }
 
+    public async Task<List<Donation>> GetRecentDonationsAsync(int count)
+    {
+        return await _context.Donations
+            .Include(d => d.Supporter)
+            .OrderByDescending(d => d.DonatedOn)
+            .Take(count)
+            .ToListAsync();
+    }
+
     public async Task<Donation?> GetDonationByIdAsync(int id)
     {
         return await _context.Donations.FindAsync(id);

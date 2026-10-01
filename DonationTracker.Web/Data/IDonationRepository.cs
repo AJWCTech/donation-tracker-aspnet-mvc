@@ -14,6 +14,8 @@ public interface IDonationRepository
 
     Task<List<Donation>> GetDonationsAsync();
 
+    Task<List<Donation>> GetRecentDonationsAsync(int count);
+
     Task<Donation?> GetDonationByIdAsync(int id);
 
     Task AddDonationAsync(Donation donation);

@@ -13,7 +13,8 @@ public interface IDonationService
     // Returns false when no supporter with that Id exists.
     Task<bool> UpdateSupporterAsync(Supporter supporter);
 
-    Task<List<Donation>> GetDonationsAsync();
+    // Returns the most recent donations only, newest first.
+    Task<List<Donation>> GetRecentDonationsAsync();
 
     Task<Donation?> GetDonationAsync(int id);
 
