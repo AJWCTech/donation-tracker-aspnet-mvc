@@ -1,9 +1,12 @@
 using DonationTracker.Web.Models;
 using DonationTracker.Web.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DonationTracker.Web.Controllers;
 
+// Every action needs a signed-in user unless it is marked [AllowAnonymous].
+[Authorize]
 public class SupportersController : Controller
 {
     private readonly IDonationService _service;
@@ -14,6 +17,7 @@ public class SupportersController : Controller
     }
 
     // GET: /Supporters
+    [AllowAnonymous]
     public async Task<IActionResult> Index()
     {
         List<Supporter> supporters = await _service.GetSupportersAsync();

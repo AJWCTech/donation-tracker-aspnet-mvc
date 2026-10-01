@@ -1,10 +1,13 @@
 using DonationTracker.Web.Models;
 using DonationTracker.Web.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DonationTracker.Web.Controllers;
 
+// Every action needs a signed-in user unless it is marked [AllowAnonymous].
+[Authorize]
 public class DonationsController : Controller
 {
     private const int PageSize = 25;
@@ -17,6 +20,7 @@ public class DonationsController : Controller
     }
 
     // GET: /Donations?page=2
+    [AllowAnonymous]
     public async Task<IActionResult> Index(int page = 1)
     {
         DonationListViewModel model = new DonationListViewModel
