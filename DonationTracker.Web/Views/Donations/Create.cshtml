@@ -1,0 +1,30 @@
+@model Donation
+
+@{
+    ViewData["Title"] = "Add donation";
+}
+
+<h1>Add donation</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div class="mb-3">
+                <label asp-for="SupporterId" class="form-label"></label>
+                <select asp-for="SupporterId" asp-items="ViewBag.Supporters" class="form-select">
+                    <option value="">-- Select a supporter --</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Amount" class="form-label"></label>
+                <input asp-for="Amount" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="DonatedOn" class="form-label"></label>
+                <input asp-for="DonatedOn" class="form-control" />
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>

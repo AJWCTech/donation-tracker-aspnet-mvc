@@ -1,0 +1,35 @@
+@model List<Supporter>
+
+@{
+    ViewData["Title"] = "Supporters";
+}
+
+<h1>Supporters</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Add supporter</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Full name</th>
+            <th>Email</th>
+            <th>Created on</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Supporter supporter in Model)
+        {
+            <tr>
+                <td>@supporter.FullName</td>
+                <td>@supporter.Email</td>
+                <td>@supporter.CreatedOn.ToString("d MMM yyyy")</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@supporter.Id">Edit</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

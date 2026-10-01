@@ -1,0 +1,37 @@
+@model DonationListViewModel
+
+@{
+    ViewData["Title"] = "Donations";
+}
+
+<h1>Donations</h1>
+
+<p class="lead">Campaign total: <strong>@Model.CampaignTotal.ToString("N2")</strong></p>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Add donation</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Supporter</th>
+            <th>Amount</th>
+            <th>Donated on</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Donation donation in Model.Donations)
+        {
+            <tr>
+                <td>@donation.Supporter?.FullName</td>
+                <td>@donation.Amount.ToString("N2")</td>
+                <td>@donation.DonatedOn.ToString("d MMM yyyy")</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@donation.Id">Edit</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
