@@ -56,5 +56,8 @@ output, so they open as graphical plans in SSMS.
   1, read-ahead reads 100), so its timing is not comparable; logical reads are.
 - The seed script gives each supporter one repeated amount. That does not
   affect the plans but the data is not realistic.
-- The index was created by hand, so EF Core's model snapshot does not know
-  about it.
+- The index was created by hand for this measurement. It has since been moved
+  into the EF Core migration `AddDonationSupporterDateIndex`, which also drops
+  the old `IX_Donations_SupporterId` because the new index starts with the same
+  column. To repeat the "before" run you need a database with only the
+  `InitialCreate` migration applied.
