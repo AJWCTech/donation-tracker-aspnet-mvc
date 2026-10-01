@@ -20,29 +20,13 @@ public class DonationServiceTests
     }
 
     [Test]
-    public async Task GetCampaignTotalAsync_SumsAllDonationAmounts()
+    public async Task GetCampaignTotalAsync_ReturnsTheTotalFromTheRepository()
     {
-        List<Donation> donations = new List<Donation>
-        {
-            new Donation { Amount = 10.50m },
-            new Donation { Amount = 20.25m },
-            new Donation { Amount = 100m }
-        };
-        _repository.Setup(r => r.GetDonationsAsync()).ReturnsAsync(donations);
+        _repository.Setup(r => r.GetDonationTotalAsync()).ReturnsAsync(130.75m);
 
         decimal total = await _service.GetCampaignTotalAsync();
 
         Assert.That(total, Is.EqualTo(130.75m));
-    }
-
-    [Test]
-    public async Task GetCampaignTotalAsync_ReturnsZero_WhenThereAreNoDonations()
-    {
-        _repository.Setup(r => r.GetDonationsAsync()).ReturnsAsync(new List<Donation>());
-
-        decimal total = await _service.GetCampaignTotalAsync();
-
-        Assert.That(total, Is.EqualTo(0m));
     }
 
     [Test]

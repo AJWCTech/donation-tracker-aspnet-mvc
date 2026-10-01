@@ -36,12 +36,10 @@ public class DonationRepository : IDonationRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<List<Donation>> GetDonationsAsync()
+    public async Task<decimal> GetDonationTotalAsync()
     {
-        return await _context.Donations
-            .Include(d => d.Supporter)
-            .OrderByDescending(d => d.DonatedOn)
-            .ToListAsync();
+        // Translated to SELECT SUM(Amount), so the database does the adding up.
+        return await _context.Donations.SumAsync(d => d.Amount);
     }
 
     public async Task<List<Donation>> GetRecentDonationsAsync(int count)

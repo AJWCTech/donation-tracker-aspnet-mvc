@@ -77,8 +77,7 @@ public class DonationService : IDonationService
 
     public async Task<decimal> GetCampaignTotalAsync()
     {
-        List<Donation> donations = await _repository.GetDonationsAsync();
-        return donations.Sum(d => d.Amount);
+        return await _repository.GetDonationTotalAsync();
     }
 
     public async Task CreateDonationAsync(Donation donation)

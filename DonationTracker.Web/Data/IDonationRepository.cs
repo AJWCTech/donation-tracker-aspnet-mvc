@@ -12,7 +12,7 @@ public interface IDonationRepository
 
     Task UpdateSupporterAsync(Supporter supporter);
 
-    Task<List<Donation>> GetDonationsAsync();
+    Task<decimal> GetDonationTotalAsync();
 
     Task<List<Donation>> GetRecentDonationsAsync(int count);
 
