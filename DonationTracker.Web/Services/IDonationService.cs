@@ -16,6 +16,9 @@ public interface IDonationService
     // Returns the most recent donations only, newest first.
     Task<List<Donation>> GetRecentDonationsAsync();
 
+    // The same donations, mapped to the shape the API returns.
+    Task<List<DonationDto>> GetRecentDonationDtosAsync();
+
     Task<Donation?> GetDonationAsync(int id);
 
     Task<decimal> GetCampaignTotalAsync();

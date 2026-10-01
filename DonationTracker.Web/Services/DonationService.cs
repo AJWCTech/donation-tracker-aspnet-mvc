@@ -50,6 +50,26 @@ public class DonationService : IDonationService
         return await _repository.GetRecentDonationsAsync(RecentDonationCount);
     }
 
+    public async Task<List<DonationDto>> GetRecentDonationDtosAsync()
+    {
+        List<Donation> donations = await _repository.GetRecentDonationsAsync(RecentDonationCount);
+
+        List<DonationDto> dtos = new List<DonationDto>();
+        foreach (Donation donation in donations)
+        {
+            DonationDto dto = new DonationDto
+            {
+                Id = donation.Id,
+                SupporterName = donation.Supporter?.FullName ?? string.Empty,
+                Amount = donation.Amount,
+                DonatedOn = donation.DonatedOn
+            };
+            dtos.Add(dto);
+        }
+
+        return dtos;
+    }
+
     public async Task<Donation?> GetDonationAsync(int id)
     {
         return await _repository.GetDonationByIdAsync(id);
