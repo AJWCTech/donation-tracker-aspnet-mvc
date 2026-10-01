@@ -2,8 +2,9 @@
 
 A small ASP.NET Core MVC practice app that records supporters and their
 donations and shows a running campaign total. It uses EF Core with SQL Server
-LocalDB, a repository and service layer, NUnit + Moq tests, hand-written SQL
-(stored procedure, index, execution plans) and one JSON API endpoint.
+LocalDB, a repository and service layer, ASP.NET Core Identity for staff
+sign-in, NUnit + Moq tests, hand-written SQL (stored procedure, index,
+execution plans) and a paged JSON API.
 
 ## Run it
 
@@ -12,19 +13,21 @@ Needs the .NET 10 SDK and SQL Server LocalDB.
 ```
 dotnet tool install --global dotnet-ef
 dotnet ef database update --project DonationTracker.Web
+dotnet user-secrets set "SeedStaff:Email" "you@example.com" --project DonationTracker.Web
+dotnet user-secrets set "SeedStaff:Password" "YourPassword1!" --project DonationTracker.Web
 dotnet run --project DonationTracker.Web --launch-profile http
 ```
 
-Then open http://localhost:5216. The API is at
-http://localhost:5216/api/donations.
+Open http://localhost:5216. Anyone can view; sign in with the staff account
+above to add or edit. The password needs upper case, lower case, a digit and a
+symbol. The API is at `/api/donations?page=1&pageSize=25`.
 
-Run the tests with `dotnet test`. The SQL scripts and measured plans are in
-`sql/` (see `sql/PLAN-NOTES.md`); interview notes are in `docs/STUDY-NOTES.md`.
+Run the tests with `dotnet test`. See `docs/DEVELOPMENT.md`,
+`docs/STUDY-NOTES.md` and `sql/PLAN-NOTES.md`.
 
 ## What I would do next
 
-- Page the donations list and the API instead of capping both at 100 rows.
-- Compute the campaign total with a SQL `SUM` rather than loading every row.
-- Add integration tests that run the repository against a real database.
-- Add authentication so only signed-in staff can add or edit records.
-- Move the hand-made index into an EF migration so the model and database agree.
+- Add roles, so an admin can manage staff accounts in the app.
+- Add search, and a supporter page listing that supporter's donations.
+- Add delete with an audit trail of who changed what.
+- Add a CI build that runs the tests on every push.

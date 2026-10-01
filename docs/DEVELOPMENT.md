@@ -18,10 +18,11 @@ deliberately small so that every layer can be read and explained in one sitting.
 | UI | The template's Bootstrap and jQuery validation, unstyled beyond that |
 | Data access | Entity Framework Core 10.0.12, SQL Server provider |
 | Database | SQL Server 2022 LocalDB |
+| Sign-in | ASP.NET Core Identity (Microsoft.AspNetCore.Identity.EntityFrameworkCore 10.0.12) |
 | Tests | NUnit 4.3.2, Moq 4.21.0, Microsoft.NET.Test.Sdk |
 
 No other packages are used. There is no AutoMapper, MediatR, logging framework,
-authentication, Docker or CI.
+Docker or CI.
 
 ## Architecture
 
@@ -48,10 +49,34 @@ mocked repository and no database. Both are registered as scoped in
 | `Donation` | `Id`, `SupporterId` (foreign key), `Amount` (`decimal(10,2)`, 0.01 to 1,000,000), `DonatedOn` |
 
 There is no Campaign table. The campaign total is the sum of all donations,
-computed in the service.
+which the repository asks the database for with a single `SUM`.
 
-The schema comes from a single EF Core migration, `InitialCreate`, which creates
-both tables, the foreign key and an index on `Donations.SupporterId`.
+The schema is managed by three EF Core migrations:
+
+| Migration | What it does |
+|---|---|
+| `InitialCreate` | Both tables, the foreign key and an index on `Donations.SupporterId` |
+| `AddDonationSupporterDateIndex` | Replaces that index with a covering index on `(SupporterId, DonatedOn DESC) INCLUDE (Amount)` |
+| `AddIdentity` | The ASP.NET Core Identity tables for staff accounts |
+
+## Paging
+
+The donations page shows 25 rows at a time. The repository uses `Skip` and
+`Take` over a fixed order (newest first, then by Id so ties cannot move between
+pages). The service counts the rows, works out the number of pages and moves an
+out-of-range page number to the nearest valid one.
+
+## Sign-in
+
+Anyone can view the lists and the API. Adding and editing need a signed-in
+member of staff: both MVC controllers carry `[Authorize]`, with
+`[AllowAnonymous]` on the list actions.
+
+ASP.NET Core Identity stores the accounts and hashes the passwords. The login
+page is a plain controller and view using `SignInManager`. There is no
+registration page; the staff account is created at startup from the
+`SeedStaff:Email` and `SeedStaff:Password` settings, which are kept in user
+secrets so that no password is in the repository.
 
 ## Validation
 
@@ -71,23 +96,31 @@ message on the form.
 
 ## API
 
-`GET /api/donations` returns the 100 most recent donations as JSON. The response
-is a list of `DonationDto` (`Id`, `SupporterName`, `Amount`, `DonatedOn`), mapped
-by hand in the service. The entity is never returned, so the JSON contract is
-independent of the database model.
+`GET /api/donations?page=1&pageSize=25` returns one page of donations as JSON:
+an `items` list of `DonationDto` (`Id`, `SupporterName`, `Amount`, `DonatedOn`)
+plus `pageNumber`, `pageSize`, `totalCount` and `totalPages`. The page size is
+limited to 100. The DTOs are mapped by hand in the service. The entity is never
+returned, so the JSON contract is independent of the database model.
 
 ## Tests
 
-`DonationTracker.Tests` covers `DonationService` with a mocked
-`IDonationRepository`:
+There are two kinds, both in `DonationTracker.Tests`.
 
-- the campaign total sums the donation amounts
-- the total is 0 when there are no donations
+**Unit tests** cover `DonationService` with a mocked `IDonationRepository`:
+
+- the campaign total is the figure the repository returns
+- total pages round up, and out-of-range page numbers and sizes are corrected
 - a future-dated donation is rejected and nothing is saved
 - a donation for an unknown supporter is rejected and nothing is saved
 - a valid donation calls the repository's add method exactly once
 
-Run them with `dotnet test`.
+**Integration tests** run the real `DonationRepository` against a real LocalDB
+database, `DonationTracker_IntegrationTests`, which is created from the
+migrations before the tests and dropped afterwards. They check that the total
+is 0 with no rows, that it sums correctly, that the count is right and that
+paging returns the newest rows first.
+
+Run them all with `dotnet test`.
 
 ## SQL work
 
@@ -104,7 +137,8 @@ The procedure was run with `SET STATISTICS IO ON` and the actual execution plan
 captured before and after creating the index. Logical reads on `Donations` went
 from 402 to 4, and the plan changed from an index seek plus a key lookup and a
 sort to a single index seek. The measured output and both plans are in
-`sql/plans/`, with the write-up in `sql/PLAN-NOTES.md`.
+`sql/plans/`, with the write-up in `sql/PLAN-NOTES.md`. Once measured, the index
+was moved into a migration so the EF Core model and the database agree.
 
 ## Project layout
 
@@ -115,7 +149,7 @@ DonationTracker.Web/
   Models/        Entities, the list view model and the API DTO
   Services/      Service interface, implementation and BusinessRuleException
   Views/         Razor views
-  Migrations/    The InitialCreate migration
+  Migrations/    The three EF Core migrations
 DonationTracker.Tests/   NUnit + Moq tests for the service
 sql/                     Hand-written scripts, plans and plan notes
 docs/                    This file and the study notes
@@ -134,21 +168,24 @@ The commit history follows the order the app was built in, one step per commit:
 7. Unit tests for the service
 8. SQL scripts, stored procedure, index and measured plans
 9. The JSON API
-10. Documentation
+10. Documentation, home page and privacy policy
+11. Campaign total as a SQL `SUM`, then paging
+12. Integration tests
+13. The index moved into a migration
+14. Staff sign-in
+15. Styling
 
 ## Running locally
 
-See the README. In short: apply the migration, then
+See the README. In short: apply the migrations, set the staff account in user
+secrets, then
 `dotnet run --project DonationTracker.Web --launch-profile http` and open
 http://localhost:5216.
 
 ## Known limitations
 
-- The donations list and the API are capped at the 100 most recent rows rather
-  than paged.
-- The campaign total loads every donation and sums in memory. A SQL `SUM` would
-  be the next change.
-- There is no authentication and there are no delete pages.
-- The covering index was created by script, so EF Core's model snapshot does not
-  include it.
+- One staff account, created from configuration. There are no roles and no page
+  for managing accounts.
+- There are no delete pages and no audit trail.
+- The supporters list is not paged or searchable.
 - The seed script gives each seeded supporter a single repeated amount.
