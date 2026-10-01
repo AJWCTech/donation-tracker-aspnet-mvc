@@ -1,8 +1,40 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<h1>DonationTracker</h1>
+
+<p class="lead">
+    A small ASP.NET Core MVC app that records supporters and the donations they
+    make, and keeps a running campaign total.
+</p>
+
+<h2 class="h4">What it does</h2>
+<ul>
+    <li><a asp-controller="Supporters" asp-action="Index">Supporters</a>: list, add and edit the people who donate.</li>
+    <li><a asp-controller="Donations" asp-action="Index">Donations</a>: list, add and edit donations, each linked to a supporter, with the campaign total at the top.</li>
+    <li><a href="/api/donations">GET /api/donations</a>: the most recent donations as JSON.</li>
+</ul>
+<p>
+    Every form is validated in the browser and again on the server. A donation
+    cannot be dated in the future and must belong to an existing supporter.
+</p>
+
+<h2 class="h4">How it was built</h2>
+<ul>
+    <li><strong>ASP.NET Core MVC on .NET 10</strong>, with Razor views, tag helpers and the template's Bootstrap.</li>
+    <li><strong>Entity Framework Core and SQL Server LocalDB</strong>, with the schema created by a single migration.</li>
+    <li><strong>Three layers</strong>: controllers call a service, the service calls a repository, and only the repository uses the database context.</li>
+    <li><strong>Business rules in the service</strong>, so they can be unit tested without a database.</li>
+    <li><strong>NUnit and Moq tests</strong> for the service, using a mocked repository.</li>
+    <li><strong>Hand-written SQL</strong>: a stored procedure and a covering index, measured before and after with execution plans (402 logical reads down to 4).</li>
+    <li><strong>A JSON API</strong> that returns a DTO, never the database entity.</li>
+</ul>
+
+<p>
+    The full write-up is in the
+    <a href="https://github.com/AJWCTech/donation-tracker-aspnet-mvc/blob/master/docs/DEVELOPMENT.md">development notes</a>,
+    and the source is on
+    <a href="https://github.com/AJWCTech/donation-tracker-aspnet-mvc">GitHub</a>.
+    See also the <a asp-controller="Home" asp-action="Privacy">privacy policy</a>.
+</p>
