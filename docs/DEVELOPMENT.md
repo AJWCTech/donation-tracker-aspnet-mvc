@@ -22,7 +22,7 @@ deliberately small so that every layer can be read and explained in one sitting.
 | Tests | NUnit 4.3.2, Moq 4.21.0, Microsoft.NET.Test.Sdk |
 
 No other packages are used. There is no AutoMapper, MediatR, logging framework,
-Docker or CI.
+or Docker.
 
 ## Architecture
 
@@ -51,13 +51,15 @@ mocked repository and no database. Both are registered as scoped in
 There is no Campaign table. The campaign total is the sum of all donations,
 which the repository asks the database for with a single `SUM`.
 
-The schema is managed by three EF Core migrations:
+The schema is managed by five EF Core migrations:
 
 | Migration | What it does |
 |---|---|
 | `InitialCreate` | Both tables, the foreign key and an index on `Donations.SupporterId` |
 | `AddDonationSupporterDateIndex` | Replaces that index with a covering index on `(SupporterId, DonatedOn DESC) INCLUDE (Amount)` |
 | `AddIdentity` | The ASP.NET Core Identity tables for staff accounts |
+| `AddDonationsBySupporterProcedure` | The stored procedure `usp_GetDonationsBySupporter`, as raw SQL |
+| `AddAuditEntries` | The `AuditEntries` table |
 
 ## Paging
 
@@ -94,6 +96,28 @@ donation cannot be dated in the future, and its supporter must exist. The
 service throws `BusinessRuleException`; the controller catches it and shows the
 message on the form.
 
+## Audit trail
+
+Every add and edit writes one `AuditEntries` row: when, who (the signed-in
+user), the action, which record, and a summary such as
+`Amount 25.00 to 40.00`. The service builds the entry, because it knows the old
+and new values; the repository saves it in the same database transaction as the
+change, so there is never a change without its record. Rows are only inserted.
+Signed-in staff can read the newest 100 at `/Audit`.
+
+## Supporter page and the stored procedure
+
+`/Supporters/Details/{id}` shows one supporter with their donations and total.
+The donations come from the stored procedure, called through
+`FromSqlInterpolated`, which sends the supporter Id as a SQL parameter rather
+than pasting it into the SQL text.
+
+## Continuous integration
+
+`.github/workflows/ci.yml` restores, builds and runs every test on a Windows
+runner (for LocalDB) on each push and pull request. `azure-pipelines.yml` is the
+same build written for Azure Pipelines; it is a sketch and has not been run.
+
 ## API
 
 `GET /api/donations?page=1&pageSize=25` returns one page of donations as JSON:
@@ -113,12 +137,16 @@ There are two kinds, both in `DonationTracker.Tests`.
 - a future-dated donation is rejected and nothing is saved
 - a donation for an unknown supporter is rejected and nothing is saved
 - a valid donation calls the repository's add method exactly once
+- the audit entry names who made the change and the old and new values
+- supporter details add up that supporter's donations
 
 **Integration tests** run the real `DonationRepository` against a real LocalDB
 database, `DonationTracker_IntegrationTests`, which is created from the
 migrations before the tests and dropped afterwards. They check that the total
 is 0 with no rows, that it sums correctly, that the count is right and that
-paging returns the newest rows first.
+paging returns the newest rows first, that the stored procedure returns only
+one supporter's donations, and that adding a donation also saves its audit
+entry.
 
 Run them all with `dotnet test`.
 
@@ -149,7 +177,7 @@ DonationTracker.Web/
   Models/        Entities, the list view model and the API DTO
   Services/      Service interface, implementation and BusinessRuleException
   Views/         Razor views
-  Migrations/    The three EF Core migrations
+  Migrations/    The five EF Core migrations
 DonationTracker.Tests/   NUnit + Moq tests for the service
 sql/                     Hand-written scripts, plans and plan notes
 docs/                    This file and the study notes
@@ -174,6 +202,9 @@ The commit history follows the order the app was built in, one step per commit:
 13. The index moved into a migration
 14. Staff sign-in
 15. Styling
+16. Supporter page using the stored procedure
+17. Audit trail
+18. CI build
 
 ## Running locally
 
@@ -186,6 +217,7 @@ http://localhost:5216.
 
 - One staff account, created from configuration. There are no roles and no page
   for managing accounts.
-- There are no delete pages and no audit trail.
+- There are no delete pages.
+- The audit trail is a plain-text summary, not a field-by-field history.
 - The supporters list is not paged or searchable.
 - The seed script gives each seeded supporter a single repeated amount.

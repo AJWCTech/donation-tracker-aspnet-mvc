@@ -1,10 +1,12 @@
 # DonationTracker
 
+[![CI](https://github.com/AJWCTech/donation-tracker-aspnet-mvc/actions/workflows/ci.yml/badge.svg)](https://github.com/AJWCTech/donation-tracker-aspnet-mvc/actions/workflows/ci.yml)
+
 A small ASP.NET Core MVC practice app that records supporters and their
 donations and shows a running campaign total. It uses EF Core with SQL Server
 LocalDB, a repository and service layer, ASP.NET Core Identity for staff
-sign-in, NUnit + Moq tests, hand-written SQL (stored procedure, index,
-execution plans) and a paged JSON API.
+sign-in, an audit trail, NUnit + Moq tests, hand-written SQL (stored procedure,
+index, execution plans), a paged JSON API and a CI build.
 
 ## Run it
 
@@ -28,6 +30,6 @@ Run the tests with `dotnet test`. See `docs/DEVELOPMENT.md`,
 ## What I would do next
 
 - Add roles, so an admin can manage staff accounts in the app.
-- Add search, and a supporter page listing that supporter's donations.
-- Add delete with an audit trail of who changed what.
-- Add a CI build that runs the tests on every push.
+- Add search on the supporters list.
+- Add delete, recorded in the audit trail.
+- Deploy it to Azure with Azure SQL.

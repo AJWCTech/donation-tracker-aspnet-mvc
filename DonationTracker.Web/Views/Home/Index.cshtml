@@ -17,10 +17,10 @@
         <div class="card card-body h-100">
             <h2>What it does</h2>
             <ul class="mb-3">
-                <li><a asp-controller="Supporters" asp-action="Index">Supporters</a>: list, add and edit the people who donate.</li>
+                <li><a asp-controller="Supporters" asp-action="Index">Supporters</a>: list, add and edit the people who donate, each with a page of their own donations.</li>
                 <li><a asp-controller="Donations" asp-action="Index">Donations</a>: a paged list with the campaign total, plus add and edit.</li>
                 <li><a href="/api/donations">GET /api/donations</a>: the same donations as paged JSON.</li>
-                <li><a asp-controller="Account" asp-action="Login">Staff sign in</a>: anyone can view, only signed-in staff can add or edit.</li>
+                <li><a asp-controller="Account" asp-action="Login">Staff sign in</a>: anyone can view, only signed-in staff can add or edit, and every change is recorded in an audit trail.</li>
             </ul>
             <p class="mb-0">
                 Every form is validated in the browser and again on the server.
@@ -38,9 +38,11 @@
                 <li><strong>Three layers</strong>: controllers call a service, the service calls a repository, and only the repository uses the database context.</li>
                 <li><strong>Business rules in the service</strong>, so they can be unit tested without a database.</li>
                 <li><strong>NUnit and Moq</strong> unit tests for the service, and integration tests that run the repository against a real database.</li>
-                <li><strong>Hand-written SQL</strong>: a stored procedure and a covering index, measured before and after with execution plans (402 logical reads down to 4).</li>
+                <li><strong>Hand-written SQL</strong>: a stored procedure the app calls with a parameter, and a covering index measured before and after with execution plans (402 logical reads down to 4).</li>
                 <li><strong>A paged JSON API</strong> that returns DTOs, never the database entities.</li>
                 <li><strong>ASP.NET Core Identity</strong> for staff sign-in, with hashed passwords.</li>
+                <li><strong>An audit trail</strong> saved in the same transaction as the change it records.</li>
+                <li><strong>A CI build</strong> that runs every test on each push.</li>
             </ul>
         </div>
     </div>
