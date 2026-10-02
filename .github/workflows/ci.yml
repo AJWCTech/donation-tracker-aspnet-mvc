@@ -1,0 +1,33 @@
+# Builds the solution and runs every test on each push and pull request.
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+
+jobs:
+  build-and-test:
+    # A Windows runner, because the integration tests need SQL Server LocalDB.
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Install the .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore packages
+        run: dotnet restore DonationTracker.slnx
+
+      - name: Build
+        run: dotnet build DonationTracker.slnx --no-restore --configuration Release
+
+      - name: Start LocalDB
+        run: sqllocaldb start MSSQLLocalDB
+
+      - name: Run unit and integration tests
+        run: dotnet test DonationTracker.slnx --no-build --configuration Release

@@ -1,0 +1,34 @@
+# SKETCH ONLY. This file has never been run: there is no Azure DevOps
+# organisation attached to this repository. It shows how the GitHub Actions
+# workflow in .github/workflows/ci.yml would be written for Azure Pipelines.
+# The build that actually runs is the GitHub one.
+
+trigger:
+  branches:
+    include:
+      - master
+
+pool:
+  vmImage: windows-latest
+
+variables:
+  buildConfiguration: Release
+
+steps:
+  - task: UseDotNet@2
+    displayName: Install the .NET SDK
+    inputs:
+      packageType: sdk
+      version: 10.0.x
+
+  - script: dotnet restore DonationTracker.slnx
+    displayName: Restore packages
+
+  - script: dotnet build DonationTracker.slnx --no-restore --configuration $(buildConfiguration)
+    displayName: Build
+
+  - script: sqllocaldb start MSSQLLocalDB
+    displayName: Start LocalDB
+
+  - script: dotnet test DonationTracker.slnx --no-build --configuration $(buildConfiguration)
+    displayName: Run unit and integration tests
