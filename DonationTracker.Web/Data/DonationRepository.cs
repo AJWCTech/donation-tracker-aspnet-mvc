@@ -1,5 +1,6 @@
 using DonationTracker.Web.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace DonationTracker.Web.Data;
 
@@ -24,15 +25,28 @@ public class DonationRepository : IDonationRepository
         return await _context.Supporters.FindAsync(id);
     }
 
-    public async Task AddSupporterAsync(Supporter supporter)
+    public async Task AddSupporterAsync(Supporter supporter, AuditEntry auditEntry)
     {
+        // The new row and its audit entry are saved in one transaction, so
+        // there is never a change without a record of it.
+        using IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync();
+
         _context.Supporters.Add(supporter);
         await _context.SaveChangesAsync();
+
+        // The database only gives the new row its Id on that first save.
+        auditEntry.EntityId = supporter.Id;
+        _context.AuditEntries.Add(auditEntry);
+        await _context.SaveChangesAsync();
+
+        await transaction.CommitAsync();
     }
 
-    public async Task UpdateSupporterAsync(Supporter supporter)
+    public async Task UpdateSupporterAsync(Supporter supporter, AuditEntry auditEntry)
     {
+        // A single SaveChanges call is already one transaction.
         _context.Supporters.Update(supporter);
+        _context.AuditEntries.Add(auditEntry);
         await _context.SaveChangesAsync();
     }
 
@@ -75,15 +89,33 @@ public class DonationRepository : IDonationRepository
         return await _context.Donations.FindAsync(id);
     }
 
-    public async Task AddDonationAsync(Donation donation)
+    public async Task AddDonationAsync(Donation donation, AuditEntry auditEntry)
     {
+        using IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync();
+
         _context.Donations.Add(donation);
+        await _context.SaveChangesAsync();
+
+        auditEntry.EntityId = donation.Id;
+        _context.AuditEntries.Add(auditEntry);
+        await _context.SaveChangesAsync();
+
+        await transaction.CommitAsync();
+    }
+
+    public async Task UpdateDonationAsync(Donation donation, AuditEntry auditEntry)
+    {
+        _context.Donations.Update(donation);
+        _context.AuditEntries.Add(auditEntry);
         await _context.SaveChangesAsync();
     }
 
-    public async Task UpdateDonationAsync(Donation donation)
+    public async Task<List<AuditEntry>> GetRecentAuditEntriesAsync(int count)
     {
-        _context.Donations.Update(donation);
-        await _context.SaveChangesAsync();
+        return await _context.AuditEntries
+            .OrderByDescending(a => a.ChangedOn)
+            .ThenByDescending(a => a.Id)
+            .Take(count)
+            .ToListAsync();
     }
 }

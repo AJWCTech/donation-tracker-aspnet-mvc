@@ -46,6 +46,7 @@ public class DonationRepositoryIntegrationTests
     {
         // Every test starts with empty tables and its own context.
         _context = CreateContext();
+        await _context.AuditEntries.ExecuteDeleteAsync();
         await _context.Donations.ExecuteDeleteAsync();
         await _context.Supporters.ExecuteDeleteAsync();
         _repository = new DonationRepository(_context);
@@ -57,6 +58,18 @@ public class DonationRepositoryIntegrationTests
         _context.Dispose();
     }
 
+    private static AuditEntry NewAuditEntry(string entityName)
+    {
+        return new AuditEntry
+        {
+            ChangedOn = DateTime.UtcNow,
+            ChangedBy = "integration-test",
+            Action = "Created",
+            EntityName = entityName,
+            Summary = "Added by a test"
+        };
+    }
+
     private async Task<Supporter> AddSupporterAsync(string fullName)
     {
         Supporter supporter = new Supporter
@@ -65,7 +78,7 @@ public class DonationRepositoryIntegrationTests
             Email = "test@example.com",
             CreatedOn = DateTime.UtcNow
         };
-        await _repository.AddSupporterAsync(supporter);
+        await _repository.AddSupporterAsync(supporter, NewAuditEntry("Supporter"));
         return supporter;
     }
 
@@ -77,7 +90,7 @@ public class DonationRepositoryIntegrationTests
             Amount = amount,
             DonatedOn = donatedOn
         };
-        await _repository.AddDonationAsync(donation);
+        await _repository.AddDonationAsync(donation, NewAuditEntry("Donation"));
     }
 
     [Test]
@@ -141,5 +154,25 @@ public class DonationRepositoryIntegrationTests
         List<Donation> donations = await _repository.GetDonationsBySupporterAsync(first.Id);
 
         Assert.That(donations.Select(d => d.Amount), Is.EqualTo(new[] { 2m, 1m }));
+    }
+
+    [Test]
+    public async Task AddDonationAsync_SavesAnAuditEntryPointingAtTheNewDonation()
+    {
+        Supporter supporter = await AddSupporterAsync("Audit Tester");
+        Donation donation = new Donation
+        {
+            SupporterId = supporter.Id,
+            Amount = 12m,
+            DonatedOn = new DateTime(2026, 1, 1)
+        };
+
+        await _repository.AddDonationAsync(donation, NewAuditEntry("Donation"));
+
+        List<AuditEntry> entries = await _repository.GetRecentAuditEntriesAsync(10);
+        AuditEntry newest = entries[0];
+        Assert.That(newest.EntityName, Is.EqualTo("Donation"));
+        Assert.That(newest.EntityId, Is.EqualTo(donation.Id));
+        Assert.That(newest.ChangedBy, Is.EqualTo("integration-test"));
     }
 }

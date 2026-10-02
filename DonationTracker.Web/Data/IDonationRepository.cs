@@ -8,9 +8,10 @@ public interface IDonationRepository
 
     Task<Supporter?> GetSupporterByIdAsync(int id);
 
-    Task AddSupporterAsync(Supporter supporter);
+    // Every add and update saves its audit entry in the same transaction.
+    Task AddSupporterAsync(Supporter supporter, AuditEntry auditEntry);
 
-    Task UpdateSupporterAsync(Supporter supporter);
+    Task UpdateSupporterAsync(Supporter supporter, AuditEntry auditEntry);
 
     Task<decimal> GetDonationTotalAsync();
 
@@ -24,7 +25,10 @@ public interface IDonationRepository
 
     Task<Donation?> GetDonationByIdAsync(int id);
 
-    Task AddDonationAsync(Donation donation);
+    Task AddDonationAsync(Donation donation, AuditEntry auditEntry);
 
-    Task UpdateDonationAsync(Donation donation);
+    Task UpdateDonationAsync(Donation donation, AuditEntry auditEntry);
+
+    // The newest audit entries first.
+    Task<List<AuditEntry>> GetRecentAuditEntriesAsync(int count);
 }

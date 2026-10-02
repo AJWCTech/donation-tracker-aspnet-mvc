@@ -11,6 +11,9 @@ public class SupportersController : Controller
 {
     private readonly IDonationService _service;
 
+    // The signed-in user's name, recorded in the audit trail.
+    private string CurrentUserName => User.Identity?.Name ?? "unknown";
+
     public SupportersController(IDonationService service)
     {
         _service = service;
@@ -53,7 +56,7 @@ public class SupportersController : Controller
             return View(supporter);
         }
 
-        await _service.CreateSupporterAsync(supporter);
+        await _service.CreateSupporterAsync(supporter, CurrentUserName);
         return RedirectToAction(nameof(Index));
     }
 
@@ -84,7 +87,7 @@ public class SupportersController : Controller
             return View(supporter);
         }
 
-        bool updated = await _service.UpdateSupporterAsync(supporter);
+        bool updated = await _service.UpdateSupporterAsync(supporter, CurrentUserName);
         if (!updated)
         {
             return NotFound();

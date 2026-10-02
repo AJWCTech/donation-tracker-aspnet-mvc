@@ -1,0 +1,39 @@
+@model List<AuditEntry>
+
+@{
+    ViewData["Title"] = "Audit trail";
+}
+
+<div class="page-header">
+    <h1>Audit trail</h1>
+</div>
+
+<p class="text-muted">The @Model.Count most recent additions and changes, newest first. Times are in UTC.</p>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>When</th>
+                    <th>Who</th>
+                    <th>Action</th>
+                    <th>Record</th>
+                    <th>What changed</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (AuditEntry entry in Model)
+                {
+                    <tr>
+                        <td class="text-nowrap">@entry.ChangedOn.ToString("d MMM yyyy HH:mm:ss")</td>
+                        <td>@entry.ChangedBy</td>
+                        <td>@entry.Action</td>
+                        <td class="text-nowrap">@entry.EntityName @entry.EntityId</td>
+                        <td>@entry.Summary</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

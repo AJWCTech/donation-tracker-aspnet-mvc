@@ -18,6 +18,8 @@ public class AppDbContext : IdentityDbContext<IdentityUser>
 
     public DbSet<Donation> Donations => Set<Donation>();
 
+    public DbSet<AuditEntry> AuditEntries => Set<AuditEntry>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

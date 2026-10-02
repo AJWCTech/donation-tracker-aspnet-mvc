@@ -14,6 +14,9 @@ public class DonationsController : Controller
 
     private readonly IDonationService _service;
 
+    // The signed-in user's name, recorded in the audit trail.
+    private string CurrentUserName => User.Identity?.Name ?? "unknown";
+
     public DonationsController(IDonationService service)
     {
         _service = service;
@@ -52,7 +55,7 @@ public class DonationsController : Controller
 
         try
         {
-            await _service.CreateDonationAsync(donation);
+            await _service.CreateDonationAsync(donation, CurrentUserName);
         }
         catch (BusinessRuleException ex)
         {
@@ -95,7 +98,7 @@ public class DonationsController : Controller
 
         try
         {
-            bool updated = await _service.UpdateDonationAsync(donation);
+            bool updated = await _service.UpdateDonationAsync(donation, CurrentUserName);
             if (!updated)
             {
                 return NotFound();

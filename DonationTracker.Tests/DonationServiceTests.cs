@@ -87,8 +87,8 @@ public class DonationServiceTests
             DonatedOn = DateTime.Today.AddDays(1)
         };
 
-        Assert.ThrowsAsync<BusinessRuleException>(() => _service.CreateDonationAsync(donation));
-        _repository.Verify(r => r.AddDonationAsync(It.IsAny<Donation>()), Times.Never);
+        Assert.ThrowsAsync<BusinessRuleException>(() => _service.CreateDonationAsync(donation, "staff@example.com"));
+        _repository.Verify(r => r.AddDonationAsync(It.IsAny<Donation>(), It.IsAny<AuditEntry>()), Times.Never);
     }
 
     [Test]
@@ -102,8 +102,8 @@ public class DonationServiceTests
             DonatedOn = DateTime.Today
         };
 
-        Assert.ThrowsAsync<BusinessRuleException>(() => _service.CreateDonationAsync(donation));
-        _repository.Verify(r => r.AddDonationAsync(It.IsAny<Donation>()), Times.Never);
+        Assert.ThrowsAsync<BusinessRuleException>(() => _service.CreateDonationAsync(donation, "staff@example.com"));
+        _repository.Verify(r => r.AddDonationAsync(It.IsAny<Donation>(), It.IsAny<AuditEntry>()), Times.Never);
     }
 
     [Test]
@@ -117,9 +117,9 @@ public class DonationServiceTests
             DonatedOn = DateTime.Today
         };
 
-        await _service.CreateDonationAsync(donation);
+        await _service.CreateDonationAsync(donation, "staff@example.com");
 
-        _repository.Verify(r => r.AddDonationAsync(donation), Times.Once);
+        _repository.Verify(r => r.AddDonationAsync(donation, It.IsAny<AuditEntry>()), Times.Once);
     }
 
     [Test]
@@ -148,5 +148,47 @@ public class DonationServiceTests
 
         Assert.That(details!.Total, Is.EqualTo(30.75m));
         Assert.That(details.Donations, Has.Count.EqualTo(2));
+    }
+
+    [Test]
+    public async Task CreateDonationAsync_RecordsWhoCreatedTheDonation()
+    {
+        _repository.Setup(r => r.GetSupporterByIdAsync(1)).ReturnsAsync(new Supporter { Id = 1 });
+        Donation donation = new Donation
+        {
+            SupporterId = 1,
+            Amount = 25m,
+            DonatedOn = DateTime.Today
+        };
+
+        await _service.CreateDonationAsync(donation, "staff@example.com");
+
+        _repository.Verify(r => r.AddDonationAsync(
+            donation,
+            It.Is<AuditEntry>(a =>
+                a.ChangedBy == "staff@example.com" &&
+                a.Action == "Created" &&
+                a.EntityName == "Donation")),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task UpdateDonationAsync_RecordsTheOldAndNewAmount()
+    {
+        Donation existing = new Donation { Id = 7, SupporterId = 1, Amount = 25m, DonatedOn = DateTime.Today };
+        Donation edited = new Donation { Id = 7, SupporterId = 1, Amount = 40m, DonatedOn = DateTime.Today };
+        _repository.Setup(r => r.GetDonationByIdAsync(7)).ReturnsAsync(existing);
+        _repository.Setup(r => r.GetSupporterByIdAsync(1)).ReturnsAsync(new Supporter { Id = 1 });
+
+        bool updated = await _service.UpdateDonationAsync(edited, "staff@example.com");
+
+        Assert.That(updated, Is.True);
+        _repository.Verify(r => r.UpdateDonationAsync(
+            existing,
+            It.Is<AuditEntry>(a =>
+                a.Action == "Updated" &&
+                a.EntityId == 7 &&
+                a.Summary == "Amount 25.00 to 40.00")),
+            Times.Once);
     }
 }

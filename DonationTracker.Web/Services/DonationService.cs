@@ -6,6 +6,7 @@ namespace DonationTracker.Web.Services;
 public class DonationService : IDonationService
 {
     private const int MaxPageSize = 100;
+    private const int RecentAuditEntryCount = 100;
 
     private readonly IDonationRepository _repository;
 
@@ -42,13 +43,17 @@ public class DonationService : IDonationService
         };
     }
 
-    public async Task CreateSupporterAsync(Supporter supporter)
+    public async Task CreateSupporterAsync(Supporter supporter, string changedBy)
     {
         supporter.CreatedOn = DateTime.UtcNow;
-        await _repository.AddSupporterAsync(supporter);
+
+        string summary = $"Full name '{supporter.FullName}', email '{supporter.Email}'";
+        AuditEntry auditEntry = BuildAuditEntry("Created", "Supporter", supporter.Id, changedBy, summary);
+
+        await _repository.AddSupporterAsync(supporter, auditEntry);
     }
 
-    public async Task<bool> UpdateSupporterAsync(Supporter supporter)
+    public async Task<bool> UpdateSupporterAsync(Supporter supporter, string changedBy)
     {
         Supporter? existing = await _repository.GetSupporterByIdAsync(supporter.Id);
         if (existing == null)
@@ -56,10 +61,24 @@ public class DonationService : IDonationService
             return false;
         }
 
+        // Describe what is changing before the old values are overwritten.
+        List<string> changes = new List<string>();
+        if (existing.FullName != supporter.FullName)
+        {
+            changes.Add($"Full name '{existing.FullName}' to '{supporter.FullName}'");
+        }
+
+        if (existing.Email != supporter.Email)
+        {
+            changes.Add($"Email '{existing.Email}' to '{supporter.Email}'");
+        }
+
+        AuditEntry auditEntry = BuildAuditEntry("Updated", "Supporter", existing.Id, changedBy, DescribeChanges(changes));
+
         // Copy only the editable fields so CreatedOn keeps its original value.
         existing.FullName = supporter.FullName;
         existing.Email = supporter.Email;
-        await _repository.UpdateSupporterAsync(existing);
+        await _repository.UpdateSupporterAsync(existing, auditEntry);
         return true;
     }
 
@@ -145,13 +164,17 @@ public class DonationService : IDonationService
         return await _repository.GetDonationTotalAsync();
     }
 
-    public async Task CreateDonationAsync(Donation donation)
+    public async Task CreateDonationAsync(Donation donation, string changedBy)
     {
         await CheckDonationRulesAsync(donation);
-        await _repository.AddDonationAsync(donation);
+
+        string summary = $"Supporter {donation.SupporterId}, amount {donation.Amount:F2}, donated on {donation.DonatedOn:yyyy-MM-dd}";
+        AuditEntry auditEntry = BuildAuditEntry("Created", "Donation", donation.Id, changedBy, summary);
+
+        await _repository.AddDonationAsync(donation, auditEntry);
     }
 
-    public async Task<bool> UpdateDonationAsync(Donation donation)
+    public async Task<bool> UpdateDonationAsync(Donation donation, string changedBy)
     {
         Donation? existing = await _repository.GetDonationByIdAsync(donation.Id);
         if (existing == null)
@@ -161,11 +184,57 @@ public class DonationService : IDonationService
 
         await CheckDonationRulesAsync(donation);
 
+        List<string> changes = new List<string>();
+        if (existing.SupporterId != donation.SupporterId)
+        {
+            changes.Add($"Supporter {existing.SupporterId} to {donation.SupporterId}");
+        }
+
+        if (existing.Amount != donation.Amount)
+        {
+            changes.Add($"Amount {existing.Amount:F2} to {donation.Amount:F2}");
+        }
+
+        if (existing.DonatedOn != donation.DonatedOn)
+        {
+            changes.Add($"Donated on {existing.DonatedOn:yyyy-MM-dd} to {donation.DonatedOn:yyyy-MM-dd}");
+        }
+
+        AuditEntry auditEntry = BuildAuditEntry("Updated", "Donation", existing.Id, changedBy, DescribeChanges(changes));
+
         existing.SupporterId = donation.SupporterId;
         existing.Amount = donation.Amount;
         existing.DonatedOn = donation.DonatedOn;
-        await _repository.UpdateDonationAsync(existing);
+        await _repository.UpdateDonationAsync(existing, auditEntry);
         return true;
+    }
+
+    public async Task<List<AuditEntry>> GetRecentAuditEntriesAsync()
+    {
+        return await _repository.GetRecentAuditEntriesAsync(RecentAuditEntryCount);
+    }
+
+    private static AuditEntry BuildAuditEntry(string action, string entityName, int entityId, string changedBy, string summary)
+    {
+        return new AuditEntry
+        {
+            ChangedOn = DateTime.UtcNow,
+            ChangedBy = changedBy,
+            Action = action,
+            EntityName = entityName,
+            EntityId = entityId,
+            Summary = summary
+        };
+    }
+
+    private static string DescribeChanges(List<string> changes)
+    {
+        if (changes.Count == 0)
+        {
+            return "Saved with no changes";
+        }
+
+        return string.Join("; ", changes);
     }
 
     private async Task CheckDonationRulesAsync(Donation donation)
