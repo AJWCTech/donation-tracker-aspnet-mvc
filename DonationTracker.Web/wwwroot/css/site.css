@@ -22,7 +22,6 @@ body {
   background-color: #fff;
   color: var(--dt-text);
   font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
-  overflow-x: clip;
 }
 
 main {
@@ -87,15 +86,19 @@ a:hover {
   margin: 0;
 }
 
-/* A full-width coloured strip behind a section, even inside the container. */
+/* A full-width coloured strip behind a section, even inside the container.
+   The shadow paints the colour out to both edges of the window and the
+   clip-path trims it to the height of the section, so nothing overflows. */
 .band {
-  background-color: var(--dt-band);
-  margin-inline: calc(50% - 50vw);
-  padding: 3rem calc(50vw - 50%);
+  --band-colour: var(--dt-band);
+  background-color: var(--band-colour);
+  box-shadow: 0 0 0 100vmax var(--band-colour);
+  clip-path: inset(0 -100vmax);
+  padding: 3rem 0;
 }
 
 .band-teal {
-  background-color: var(--dt-band-teal);
+  --band-colour: var(--dt-band-teal);
 }
 
 /* Buttons, form fields and paging links */
