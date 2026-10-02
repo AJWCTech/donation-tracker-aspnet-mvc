@@ -8,6 +8,9 @@ public interface IDonationService
 
     Task<Supporter?> GetSupporterAsync(int id);
 
+    // The supporter with their donations and total. Null when the supporter does not exist.
+    Task<SupporterDetails?> GetSupporterDetailsAsync(int id);
+
     Task CreateSupporterAsync(Supporter supporter);
 
     // Returns false when no supporter with that Id exists.

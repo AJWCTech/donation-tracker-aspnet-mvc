@@ -60,6 +60,16 @@ public class DonationRepository : IDonationRepository
             .ToListAsync();
     }
 
+    public async Task<List<Donation>> GetDonationsBySupporterAsync(int supporterId)
+    {
+        // FromSqlInterpolated turns {supporterId} into a SQL parameter. The
+        // value is never pasted into the SQL text, so it cannot be used for
+        // SQL injection.
+        return await _context.Donations
+            .FromSqlInterpolated($"EXEC dbo.usp_GetDonationsBySupporter @SupporterId = {supporterId}")
+            .ToListAsync();
+    }
+
     public async Task<Donation?> GetDonationByIdAsync(int id)
     {
         return await _context.Donations.FindAsync(id);

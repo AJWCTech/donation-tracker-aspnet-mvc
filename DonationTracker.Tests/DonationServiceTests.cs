@@ -121,4 +121,32 @@ public class DonationServiceTests
 
         _repository.Verify(r => r.AddDonationAsync(donation), Times.Once);
     }
+
+    [Test]
+    public async Task GetSupporterDetailsAsync_ReturnsNull_WhenSupporterDoesNotExist()
+    {
+        _repository.Setup(r => r.GetSupporterByIdAsync(99)).ReturnsAsync((Supporter?)null);
+
+        SupporterDetails? details = await _service.GetSupporterDetailsAsync(99);
+
+        Assert.That(details, Is.Null);
+        _repository.Verify(r => r.GetDonationsBySupporterAsync(It.IsAny<int>()), Times.Never);
+    }
+
+    [Test]
+    public async Task GetSupporterDetailsAsync_AddsUpTheSupportersDonations()
+    {
+        List<Donation> donations = new List<Donation>
+        {
+            new Donation { Amount = 10.50m },
+            new Donation { Amount = 20.25m }
+        };
+        _repository.Setup(r => r.GetSupporterByIdAsync(1)).ReturnsAsync(new Supporter { Id = 1 });
+        _repository.Setup(r => r.GetDonationsBySupporterAsync(1)).ReturnsAsync(donations);
+
+        SupporterDetails? details = await _service.GetSupporterDetailsAsync(1);
+
+        Assert.That(details!.Total, Is.EqualTo(30.75m));
+        Assert.That(details.Donations, Has.Count.EqualTo(2));
+    }
 }

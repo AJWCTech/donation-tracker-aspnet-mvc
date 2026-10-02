@@ -24,6 +24,19 @@ public class SupportersController : Controller
         return View(supporters);
     }
 
+    // GET: /Supporters/Details/5
+    [AllowAnonymous]
+    public async Task<IActionResult> Details(int id)
+    {
+        SupporterDetails? details = await _service.GetSupporterDetailsAsync(id);
+        if (details == null)
+        {
+            return NotFound();
+        }
+
+        return View(details);
+    }
+
     // GET: /Supporters/Create
     public IActionResult Create()
     {

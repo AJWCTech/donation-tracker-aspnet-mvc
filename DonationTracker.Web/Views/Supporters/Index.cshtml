@@ -24,7 +24,7 @@
                 @foreach (Supporter supporter in Model)
                 {
                     <tr>
-                        <td>@supporter.FullName</td>
+                        <td><a asp-action="Details" asp-route-id="@supporter.Id">@supporter.FullName</a></td>
                         <td>@supporter.Email</td>
                         <td>@supporter.CreatedOn.ToString("d MMM yyyy")</td>
                         <td class="text-end">

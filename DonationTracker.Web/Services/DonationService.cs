@@ -24,6 +24,24 @@ public class DonationService : IDonationService
         return await _repository.GetSupporterByIdAsync(id);
     }
 
+    public async Task<SupporterDetails?> GetSupporterDetailsAsync(int id)
+    {
+        Supporter? supporter = await _repository.GetSupporterByIdAsync(id);
+        if (supporter == null)
+        {
+            return null;
+        }
+
+        List<Donation> donations = await _repository.GetDonationsBySupporterAsync(id);
+
+        return new SupporterDetails
+        {
+            Supporter = supporter,
+            Donations = donations,
+            Total = donations.Sum(d => d.Amount)
+        };
+    }
+
     public async Task CreateSupporterAsync(Supporter supporter)
     {
         supporter.CreatedOn = DateTime.UtcNow;

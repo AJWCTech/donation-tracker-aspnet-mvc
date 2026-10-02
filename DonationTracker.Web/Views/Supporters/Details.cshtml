@@ -1,0 +1,57 @@
+@model SupporterDetails
+
+@{
+    ViewData["Title"] = Model.Supporter.FullName;
+}
+
+<div class="page-header">
+    <h1>@Model.Supporter.FullName</h1>
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model.Supporter.Id" class="btn btn-primary">Edit supporter</a>
+        <a asp-action="Index" class="btn btn-secondary">Back to supporters</a>
+    </div>
+</div>
+
+<div class="card card-body mb-4">
+    <div class="row g-3">
+        <div class="col-sm-6">
+            <div class="stat-label">Email</div>
+            <div>@Model.Supporter.Email</div>
+            <div class="stat-label mt-3">Supporter since</div>
+            <div>@Model.Supporter.CreatedOn.ToString("d MMM yyyy")</div>
+        </div>
+        <div class="col-sm-6">
+            <div class="stat-label">Total given</div>
+            <div class="stat-value">&pound;@Model.Total.ToString("N2")</div>
+            <div class="text-muted small">From @Model.Donations.Count.ToString("N0") donations</div>
+        </div>
+    </div>
+</div>
+
+<h2>Donations</h2>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Donated on</th>
+                    <th class="amount">Amount</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Donation donation in Model.Donations)
+                {
+                    <tr>
+                        <td>@donation.DonatedOn.ToString("d MMM yyyy")</td>
+                        <td class="amount">&pound;@donation.Amount.ToString("N2")</td>
+                        <td class="text-end">
+                            <a asp-controller="Donations" asp-action="Edit" asp-route-id="@donation.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

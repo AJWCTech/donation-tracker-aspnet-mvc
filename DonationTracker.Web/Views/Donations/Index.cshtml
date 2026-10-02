@@ -30,7 +30,7 @@
                 @foreach (Donation donation in Model.Page.Donations)
                 {
                     <tr>
-                        <td>@donation.Supporter?.FullName</td>
+                        <td><a asp-controller="Supporters" asp-action="Details" asp-route-id="@donation.SupporterId">@donation.Supporter?.FullName</a></td>
                         <td class="amount">&pound;@donation.Amount.ToString("N2")</td>
                         <td>@donation.DonatedOn.ToString("d MMM yyyy")</td>
                         <td class="text-end">

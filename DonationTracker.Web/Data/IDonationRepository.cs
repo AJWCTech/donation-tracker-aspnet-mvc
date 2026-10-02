@@ -19,6 +19,9 @@ public interface IDonationRepository
     // pageNumber starts at 1. Newest donations come first.
     Task<List<Donation>> GetDonationsPageAsync(int pageNumber, int pageSize);
 
+    // One supporter's donations, newest first, read through a stored procedure.
+    Task<List<Donation>> GetDonationsBySupporterAsync(int supporterId);
+
     Task<Donation?> GetDonationByIdAsync(int id);
 
     Task AddDonationAsync(Donation donation);

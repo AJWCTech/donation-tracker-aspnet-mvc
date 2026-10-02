@@ -128,4 +128,18 @@ public class DonationRepositoryIntegrationTests
         Assert.That(secondPage.Select(d => d.Amount), Is.EqualTo(new[] { 1m }));
         Assert.That(firstPage[0].Supporter!.FullName, Is.EqualTo("Page Tester"));
     }
+
+    [Test]
+    public async Task GetDonationsBySupporterAsync_ReturnsOnlyThatSupportersDonations_NewestFirst()
+    {
+        Supporter first = await AddSupporterAsync("First Supporter");
+        Supporter second = await AddSupporterAsync("Second Supporter");
+        await AddDonationAsync(first, 1m, new DateTime(2026, 1, 1));
+        await AddDonationAsync(first, 2m, new DateTime(2026, 1, 2));
+        await AddDonationAsync(second, 99m, new DateTime(2026, 1, 3));
+
+        List<Donation> donations = await _repository.GetDonationsBySupporterAsync(first.Id);
+
+        Assert.That(donations.Select(d => d.Amount), Is.EqualTo(new[] { 2m, 1m }));
+    }
 }
