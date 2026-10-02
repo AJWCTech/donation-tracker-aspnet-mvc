@@ -15,7 +15,7 @@ deliberately small so that every layer can be read and explained in one sitting.
 |---|---|
 | Runtime | .NET 10 (`net10.0`) |
 | Web | ASP.NET Core MVC with Razor views and tag helpers |
-| UI | The template's Bootstrap and jQuery validation, unstyled beyond that |
+| UI | The template's Bootstrap and jQuery validation, with one small custom stylesheet and no other front-end libraries |
 | Data access | Entity Framework Core 10.0.12, SQL Server provider |
 | Database | SQL Server 2022 LocalDB |
 | Sign-in | ASP.NET Core Identity (Microsoft.AspNetCore.Identity.EntityFrameworkCore 10.0.12) |

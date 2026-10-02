@@ -2,42 +2,82 @@
     ViewData["Title"] = "Home";
 }
 
-<section class="hero">
-    <h1>DonationTracker</h1>
+<section class="band hero">
+    <h1><span class="accent">Donation</span>Tracker</h1>
     <p class="lead">
         A small ASP.NET Core MVC app that records supporters and the donations
         they make, and keeps a running campaign total.
     </p>
-    <a asp-controller="Donations" asp-action="Index" class="btn btn-light">View donations</a>
-    <a asp-controller="Supporters" asp-action="Index" class="btn btn-outline-light">View supporters</a>
+    <a asp-controller="Donations" asp-action="Index" class="btn btn-primary">View donations</a>
+    <a asp-controller="Supporters" asp-action="Index" class="hero-link">View supporters</a>
 </section>
 
-<div class="row g-4">
-    <div class="col-lg-5">
-        <div class="card card-body h-100">
-            <h2>What it does</h2>
-            <ul class="mb-3">
-                <li><a asp-controller="Supporters" asp-action="Index">Supporters</a>: list, add and edit the people who donate, each with a page of their own donations.</li>
-                <li><a asp-controller="Donations" asp-action="Index">Donations</a>: a paged list with the campaign total, plus add and edit.</li>
-                <li><a href="/api/donations">GET /api/donations</a>: the same donations as paged JSON.</li>
-                <li><a asp-controller="Account" asp-action="Login">Staff sign in</a>: anyone can view, only signed-in staff can add or edit, and every change is recorded in an audit trail.</li>
-            </ul>
-            <p class="mb-0">
-                Every form is validated in the browser and again on the server.
-                A donation cannot be dated in the future and must belong to an
-                existing supporter.
-            </p>
+<section class="py-5">
+    <h2>What <span class="accent-red">it</span> does</h2>
+    <p class="text-muted">
+        Every form is validated in the browser and again on the server. A
+        donation cannot be dated in the future and must belong to an existing
+        supporter.
+    </p>
+
+    <div class="row g-3">
+        <div class="col-sm-6 col-lg-3">
+            <div class="card card-body feature-card h-100">
+                <div class="feature-icon icon-orange">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 4-6 8-6s8 2 8 6" /></svg>
+                </div>
+                <h3>Supporters</h3>
+                <p>List, add and edit the people who donate, each with a page of their own donations.</p>
+                <a asp-controller="Supporters" asp-action="Index">Open supporters</a>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card card-body feature-card h-100">
+                <div class="feature-icon icon-green">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-9.5A4 4 0 0 1 12 8a4 4 0 0 1 7 2.5C19 15.6 12 20 12 20z" /></svg>
+                </div>
+                <h3>Donations</h3>
+                <p>A paged list with the campaign total, plus add and edit.</p>
+                <a asp-controller="Donations" asp-action="Index">Open donations</a>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card card-body feature-card h-100">
+                <div class="feature-icon icon-teal">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l-6 7 6 7M16 5l6 7-6 7" /></svg>
+                </div>
+                <h3>JSON API</h3>
+                <p>The same donations as paged JSON, returned as DTOs and never as database entities.</p>
+                <a href="/api/donations">Open GET /api/donations</a>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card card-body feature-card h-100">
+                <div class="feature-icon icon-pink">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="1.5" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>
+                </div>
+                <h3>Staff sign-in</h3>
+                <p>Anyone can view. Only signed-in staff can add or edit, and every change goes in an audit trail.</p>
+                <a asp-controller="Account" asp-action="Login">Open staff sign in</a>
+            </div>
         </div>
     </div>
-    <div class="col-lg-7">
-        <div class="card card-body h-100">
-            <h2>How it was built</h2>
+</section>
+
+<section class="band band-teal">
+    <h2>How it was <span class="accent">built</span></h2>
+    <div class="row">
+        <div class="col-lg-6">
             <ul class="mb-0">
                 <li><strong>ASP.NET Core MVC on .NET 10</strong>, with Razor views, tag helpers and Bootstrap.</li>
                 <li><strong>Entity Framework Core and SQL Server LocalDB</strong>, with the schema managed by migrations.</li>
                 <li><strong>Three layers</strong>: controllers call a service, the service calls a repository, and only the repository uses the database context.</li>
                 <li><strong>Business rules in the service</strong>, so they can be unit tested without a database.</li>
                 <li><strong>NUnit and Moq</strong> unit tests for the service, and integration tests that run the repository against a real database.</li>
+            </ul>
+        </div>
+        <div class="col-lg-6">
+            <ul class="mb-0">
                 <li><strong>Hand-written SQL</strong>: a stored procedure the app calls with a parameter, and a covering index measured before and after with execution plans (402 logical reads down to 4).</li>
                 <li><strong>A paged JSON API</strong> that returns DTOs, never the database entities.</li>
                 <li><strong>ASP.NET Core Identity</strong> for staff sign-in, with hashed passwords.</li>
@@ -46,7 +86,7 @@
             </ul>
         </div>
     </div>
-</div>
+</section>
 
 <p class="mt-4 mb-0">
     The full write-up is in the

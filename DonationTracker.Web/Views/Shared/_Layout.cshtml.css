@@ -1,12 +1,10 @@
 /* Styles for the navigation bar and footer only. Everything else is in
-   wwwroot/css/site.css. */
+   wwwroot/css/site.css, including the links inside them: scoped styles do not
+   reach elements that a tag helper writes out. */
 
 .site-nav {
-  background-color: var(--dt-navy);
-}
-
-.navbar-brand {
-  font-weight: 600;
+  background-color: #fff;
+  border-bottom: 1px solid var(--dt-border);
 }
 
 .sign-out {
@@ -15,9 +13,8 @@
 }
 
 .site-footer {
-  background-color: #fff;
-  border-top: 1px solid var(--dt-border);
-  color: var(--dt-muted);
+  background-color: #424348;
+  color: #d9dadb;
   font-size: 0.875rem;
-  padding: 1rem 0;
+  padding: 1.25rem 0;
 }

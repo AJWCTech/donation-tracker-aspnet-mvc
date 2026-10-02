@@ -2,40 +2,70 @@
    colours, spacing and a few small components on top of it. */
 
 :root {
-  --dt-navy: #14213d;
-  --dt-accent: #0f766e;
-  --dt-accent-dark: #0b5c56;
-  --dt-background: #f5f7fa;
-  --dt-border: #e3e8ef;
-  --dt-text: #1f2937;
-  --dt-muted: #64748b;
+  --dt-red: #d13017;
+  --dt-red-dark: #a42616;
+  --dt-teal: #007578;
+  --dt-teal-light: #1dac98;
+  --dt-orange: #f1860d;
+  --dt-green: #7db833;
+  --dt-pink: #e94270;
+  --dt-text: #1d1d1d;
+  --dt-muted: #4f555a;
+  --dt-band: #f4f4f4;
+  --dt-band-teal: #e6f1f1;
+  --dt-border: #e2e5e6;
 }
 
 /* Page */
 
 body {
-  background-color: var(--dt-background);
+  background-color: #fff;
   color: var(--dt-text);
+  font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  overflow-x: clip;
+}
+
+main {
+  padding-top: 2rem;
 }
 
 h1 {
-  font-size: 1.75rem;
-  font-weight: 600;
-  color: var(--dt-navy);
+  font-size: 2.25rem;
+  font-weight: 400;
 }
 
 h2 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--dt-navy);
+  font-size: 1.5rem;
+  font-weight: 400;
 }
 
 a {
-  color: var(--dt-accent);
+  color: var(--dt-teal);
 }
 
 a:hover {
-  color: var(--dt-accent-dark);
+  color: var(--dt-red-dark);
+}
+
+/* The site name in the header, and links in the footer. */
+.navbar-brand {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.site-footer a {
+  color: #fff;
+}
+
+/* One word of a heading picked out in colour. */
+.accent {
+  color: var(--dt-teal);
+}
+
+.accent-red {
+  color: var(--dt-red);
 }
 
 /* Long text pages, such as the privacy policy, read better in a narrow column. */
@@ -57,39 +87,55 @@ a:hover {
   margin: 0;
 }
 
-/* Buttons, form fields and paging links in the accent colour */
+/* A full-width coloured strip behind a section, even inside the container. */
+.band {
+  background-color: var(--dt-band);
+  margin-inline: calc(50% - 50vw);
+  padding: 3rem calc(50vw - 50%);
+}
+
+.band-teal {
+  background-color: var(--dt-band-teal);
+}
+
+/* Buttons, form fields and paging links */
+
+.btn {
+  border-radius: 0.2rem;
+  font-weight: 600;
+}
 
 .btn-primary {
-  --bs-btn-bg: var(--dt-accent);
-  --bs-btn-border-color: var(--dt-accent);
-  --bs-btn-hover-bg: var(--dt-accent-dark);
-  --bs-btn-hover-border-color: var(--dt-accent-dark);
-  --bs-btn-active-bg: var(--dt-accent-dark);
-  --bs-btn-active-border-color: var(--dt-accent-dark);
-  --bs-btn-disabled-bg: var(--dt-accent);
-  --bs-btn-disabled-border-color: var(--dt-accent);
+  --bs-btn-bg: var(--dt-red);
+  --bs-btn-border-color: var(--dt-red);
+  --bs-btn-hover-bg: var(--dt-red-dark);
+  --bs-btn-hover-border-color: var(--dt-red-dark);
+  --bs-btn-active-bg: var(--dt-red-dark);
+  --bs-btn-active-border-color: var(--dt-red-dark);
+  --bs-btn-disabled-bg: var(--dt-red);
+  --bs-btn-disabled-border-color: var(--dt-red);
 }
 
 .btn:focus-visible,
 .form-control:focus,
 .form-select:focus {
-  border-color: var(--dt-accent);
-  box-shadow: 0 0 0 0.2rem rgba(15, 118, 110, 0.25);
+  border-color: var(--dt-teal);
+  box-shadow: 0 0 0 0.2rem rgba(0, 117, 120, 0.25);
 }
 
 .pagination {
-  --bs-pagination-color: var(--dt-accent);
-  --bs-pagination-hover-color: var(--dt-accent-dark);
-  --bs-pagination-active-bg: var(--dt-accent);
-  --bs-pagination-active-border-color: var(--dt-accent);
+  --bs-pagination-color: var(--dt-teal);
+  --bs-pagination-hover-color: var(--dt-red-dark);
+  --bs-pagination-active-bg: var(--dt-red);
+  --bs-pagination-active-border-color: var(--dt-red);
+  --bs-pagination-border-radius: 0.2rem;
 }
 
 /* Cards and tables */
 
 .card {
   border-color: var(--dt-border);
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 2px rgba(20, 33, 61, 0.05);
+  border-radius: 0.25rem;
 }
 
 .table > :not(caption) > * > * {
@@ -97,7 +143,7 @@ a:hover {
 }
 
 .table > thead th {
-  background-color: #f9fafb;
+  background-color: var(--dt-band);
   color: var(--dt-muted);
   font-size: 0.75rem;
   font-weight: 600;
@@ -122,9 +168,8 @@ a:hover {
 }
 
 .stat-value {
-  color: var(--dt-navy);
+  color: var(--dt-teal);
   font-size: 2rem;
-  font-weight: 600;
   font-variant-numeric: tabular-nums;
   line-height: 1.2;
 }
@@ -132,19 +177,76 @@ a:hover {
 /* The introduction on the home page */
 
 .hero {
-  background-color: var(--dt-navy);
-  border-radius: 0.75rem;
-  color: #fff;
-  margin-bottom: 1.5rem;
-  padding: 2.5rem 2rem;
+  margin-top: -2rem;
 }
 
 .hero h1 {
-  color: #fff;
-  font-size: 2.25rem;
+  font-size: 2.75rem;
 }
 
 .hero .lead {
-  color: #cbd5e1;
-  max-width: 40rem;
+  color: var(--dt-teal);
+  max-width: 36rem;
 }
+
+.hero-link {
+  color: var(--dt-red-dark);
+  font-weight: 600;
+  margin-left: 1rem;
+}
+
+/* Feature cards on the home page: a round icon sits half above the card. */
+
+.feature-card {
+  margin-top: 1.5rem;
+  padding-top: 0;
+  text-align: center;
+}
+
+.feature-card h3 {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.feature-card p {
+  color: var(--dt-muted);
+  font-size: 0.9rem;
+}
+
+.feature-card a {
+  color: var(--dt-text);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.feature-card a::after {
+  color: var(--dt-red);
+  content: " \203A";
+}
+
+.feature-icon {
+  align-items: center;
+  border-radius: 50%;
+  color: #fff;
+  display: flex;
+  height: 3rem;
+  justify-content: center;
+  margin: -1.5rem auto 0.75rem;
+  width: 3rem;
+}
+
+.feature-icon svg {
+  fill: none;
+  height: 1.4rem;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+  width: 1.4rem;
+}
+
+.icon-orange { background-color: var(--dt-orange); }
+.icon-green { background-color: var(--dt-green); }
+.icon-teal { background-color: var(--dt-teal-light); }
+.icon-pink { background-color: var(--dt-pink); }
